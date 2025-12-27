@@ -4,7 +4,11 @@ function PreferenceSelector({ onSelect }) {
       <h2>Select your travel preference</h2>
 
       <button onClick={() => onSelect("foodie")}>
-        🍜 Foodie
+        🍽️ Foodie
+      </button>
+
+      <button onClick={() => onSelect("explorer")}>
+        🧭 Explorer
       </button>
 
       <button onClick={() => onSelect("photographer")}>

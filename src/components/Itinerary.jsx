@@ -1,42 +1,33 @@
-function Itinerary({ days, preference }) {
-  const itinerary = [];
+import { itineraryActivities } from "../data/itineraryActivities";
+import { generatePlanner } from "../utils/generatePlanner";
 
-  for (let d = 1; d <= days; d++) {
-    if (preference === "foodie") {
-      itinerary.push({
-        day: d,
-        plan: [
-          "Breakfast at famous local spot 🍽️",
-          "City sightseeing 🏛️",
-          "Lunch at popular restaurant",
-          "Street food walk in evening 🌮",
-        ],
-      });
-    } else if (preference === "photographer") {
-      itinerary.push({
-        day: d,
-        plan: [
-          "Sunrise photography 📸",
-          "Heritage walk",
-          "Lunch break",
-          "Golden hour photography 🌇",
-        ],
-      });
-    }
-  }
+function Itinerary({ days, preference }) {
+  const planner = generatePlanner(
+    days,
+    preference,
+    itineraryActivities
+  );
 
   return (
     <div>
-      <h2>Day-wise Itinerary</h2>
+      <h2>🗓️ Day-wise Planner</h2>
 
-      {itinerary.map((dayPlan) => (
-        <div key={dayPlan.day}>
-          <h3>Day {dayPlan.day}</h3>
-          <ul>
-            {dayPlan.plan.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
+      {planner.map((dayPlan, dayIndex) => (
+        <div key={dayIndex} style={{ marginBottom: "20px" }}>
+          <h3>Day {dayIndex + 1}</h3>
+
+          <table>
+            <tbody>
+              {dayPlan.map((slot, index) => (
+                <tr key={index}>
+                  <td style={{ paddingRight: "15px", fontWeight: "bold" }}>
+                    {slot.time}
+                  </td>
+                  <td>{slot.activity}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       ))}
     </div>

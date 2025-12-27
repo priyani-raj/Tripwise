@@ -63,6 +63,7 @@ function App() {
 
           <HotelRecommendations
             city={tripData.destination}
+            preference={preference}
           />
 
           <Itinerary
