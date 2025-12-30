@@ -14,7 +14,6 @@ function App() {
   const [travelMode, setTravelMode] = useState(null);
   const [distanceInfo, setDistanceInfo] = useState(null);
 
-  // ✅ Accordion state
   const [openSections, setOpenSections] = useState({
     summary: true,
     food: false,
@@ -34,7 +33,7 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-blue-300 via-indigo-300 to-blue-400 px-6 pt-6">
       {/* TITLE */}
       <h1 className="text-center text-4xl md:text-5xl font-extrabold text-blue-900 mb-8">
-        ✈️ TripWise
+        TripWise ✈️
       </h1>
 
       {/* TRIP INPUT */}
