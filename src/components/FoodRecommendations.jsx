@@ -47,12 +47,12 @@ function FoodRecommendations({ preference, city }) {
     fetchFood();
   }, [normalizedPreference, city]);
 
-  if (normalizedPreference !== "foodie") return null;
 
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-semibold text-slate-800 flex items-center gap-2">
         🍜 Food Recommendations
+        {normalizedPreference === "foodie" && " (Top Picks for You)"}
       </h2>
 
       {loading && (
