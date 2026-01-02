@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import fallbackFood from "../data/fallbackFood";
 import { renderBoldText } from "../utils/renderBoldText";
 
+
 function FoodRecommendations({ preference, city }) {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const API_URL = import.meta.env.VITE_API_URL;
   const normalizedPreference = preference?.trim().toLowerCase();
   const cleanCity = city?.trim().toLowerCase();
 
@@ -33,8 +34,9 @@ function FoodRecommendations({ preference, city }) {
     async function fetchFood() {
       setLoading(true);
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/recommendations",
+       const response = await fetch(
+  `${API_URL}/api/recommendations`,
+
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

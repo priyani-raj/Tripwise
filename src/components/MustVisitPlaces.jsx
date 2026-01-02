@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import fallbackPlaces from "../data/fallbackPlaces";
 import { renderBoldText } from "../utils/renderBoldText";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function MustVisitPlaces({ city }) {
   const [places, setPlaces] = useState([]);
@@ -32,7 +33,9 @@ function MustVisitPlaces({ city }) {
     async function fetchPlaces() {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:5000/api/recommendations", {
+       const res = await fetch(
+  `${API_URL}/api/recommendations`,
+ {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

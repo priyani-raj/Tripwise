@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import fallbackHotels from "../data/fallbackHotels";
 import { renderBoldText } from "../utils/renderBoldText";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function HotelRecommendations({ city, preference }) {
   const [hotels, setHotels] = useState([]);
@@ -52,8 +53,9 @@ function HotelRecommendations({ city, preference }) {
     async function fetchHotels() {
       setLoading(true);
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/recommendations",
+       const response = await fetch(
+  `${API_URL}/api/recommendations`,
+
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
