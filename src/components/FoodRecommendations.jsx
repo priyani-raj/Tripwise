@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
-import { getFoodPlaces } from "../utils/getFoodPlaces";
 import fallbackFood from "../data/fallbackFood";
+import { renderBoldText } from "../utils/renderBoldText";
 
 function FoodRecommendations({ preference, city }) {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Normalize preference
   const normalizedPreference = preference?.trim().toLowerCase();
-
-  // Clean city input
   const cleanCity = city?.trim().toLowerCase();
 
-  // City aliases
   const cityKeyMap = {
     varanasi: "Banaras",
     kashi: "Banaras",
@@ -28,16 +24,39 @@ function FoodRecommendations({ preference, city }) {
       ? cleanCity.charAt(0).toUpperCase() + cleanCity.slice(1)
       : "");
 
-  const fallback = fallbackFood[normalizedCity] || [];
+  const fallback =
+    fallbackFood[normalizedCity] || fallbackFood.Generic || [];
 
   useEffect(() => {
-    if (normalizedPreference !== "foodie" || !city) return;
+    if (!city) return;
 
     async function fetchFood() {
       setLoading(true);
       try {
-        const data = await getFoodPlaces(city);
-        setPlaces(Array.isArray(data) ? data : []);
+        const response = await fetch(
+          "http://localhost:5000/api/recommendations",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              city,
+              preference,
+              type: "food",
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        // ✅ Parse Gemini text → list
+        const aiList = data.recommendations
+          ?.split("\n")
+          .map(line =>
+            line.replace(/^[-•*]\s*/, "").trim()
+          )
+          .filter(line => line.length > 0);
+
+        setPlaces(aiList || []);
       } catch {
         setPlaces([]);
       }
@@ -45,68 +64,54 @@ function FoodRecommendations({ preference, city }) {
     }
 
     fetchFood();
-  }, [normalizedPreference, city]);
-
+  }, [city, preference]);
 
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-semibold text-slate-800 flex items-center gap-2">
         🍜 Food Recommendations
-        {normalizedPreference === "foodie" && " (Top Picks for You)"}
       </h2>
 
       {loading && (
-        <p className="text-slate-600">Loading food suggestions...</p>
+        <p className="text-slate-600">
+          Loading food suggestions...
+        </p>
       )}
 
-      {/* Fallback data */}
       {!loading && places.length === 0 && (
         <div className="space-y-2">
           <p className="text-slate-600">
-            No online food data available.
+            Showing popular local food instead.
           </p>
 
-          <p className="font-medium text-slate-700">
-            Popular local food in {normalizedCity}:
-          </p>
-
-          {fallback.length === 0 ? (
-            <p className="text-red-500 text-sm">
-              ❌ No fallback data found (check city key)
-            </p>
-          ) : (
-            <ul className="list-disc list-inside space-y-1 text-slate-700">
-              {fallback.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          )}
+          <ul className="space-y-2">
+            {fallback.map((item, index) => (
+              <li
+                key={index}
+                className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-slate-800"
+              >
+                🍽️ {item}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
-      {/* API data */}
       {places.length > 0 && (
-        <div className="space-y-3">
-          {places.map((place) => (
-            <div
-              key={place.id}
+        <ul className="space-y-3">
+          {places.map((item, index) => (
+            <li
+              key={index}
               className="bg-white/90 backdrop-blur
                          border border-blue-200/60
                          rounded-xl p-4
-                         shadow-md shadow-blue-200/30"
+                         shadow-md shadow-blue-200/30
+                         text-slate-800"
             >
-              <h4 className="font-semibold text-slate-800">
-                {place.name}
-              </h4>
-              <p className="text-sm text-slate-600">
-                ⭐ {place.rating}
-              </p>
-              <p className="text-sm text-slate-600">
-                {place.address}
-              </p>
-            </div>
+              🍽️ {renderBoldText(item)}
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );

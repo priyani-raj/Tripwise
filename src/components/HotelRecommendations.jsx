@@ -1,6 +1,11 @@
+import { useEffect, useState } from "react";
 import fallbackHotels from "../data/fallbackHotels";
+import { renderBoldText } from "../utils/renderBoldText";
 
 function HotelRecommendations({ city, preference }) {
+  const [hotels, setHotels] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   if (!city || !preference) return null;
 
   // Normalize preference
@@ -36,7 +41,49 @@ function HotelRecommendations({ city, preference }) {
     cityKeyMap[cleanCity] ||
     cleanCity.charAt(0).toUpperCase() + cleanCity.slice(1);
 
-  const hotels = fallbackHotels[pref]?.[normalizedCity] || [];
+  // 🔹 Fallback hotels (safety net)
+  const fallback =
+    fallbackHotels[pref]?.[normalizedCity] ||
+    fallbackHotels[pref]?.Generic ||
+    [];
+
+  // 🔹 AI hotel fetch
+  useEffect(() => {
+    async function fetchHotels() {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/recommendations",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              city,
+              preference,
+              type: "hotels",
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        // Convert Gemini text → list
+        const aiList = data.recommendations
+          ?.split("\n")
+          .map(line =>
+            line.replace(/^[-•*]\s*/, "").trim()
+          )
+          .filter(Boolean);
+
+        setHotels(aiList || []);
+      } catch {
+        setHotels([]);
+      }
+      setLoading(false);
+    }
+
+    fetchHotels();
+  }, [city, preference]);
 
   return (
     <div className="space-y-4">
@@ -44,26 +91,48 @@ function HotelRecommendations({ city, preference }) {
         🏨 Hotel Recommendations
       </h2>
 
-      {hotels.length === 0 ? (
+      {loading && (
         <p className="text-slate-600">
-          No hotel data available for this preference.
+          Finding the best stays for you...
         </p>
-      ) : (
-        <div className="space-y-3">
+      )}
+
+      {/* 🔹 Fallback */}
+      {!loading && hotels.length === 0 && (
+        <div className="space-y-2">
+          <p className="text-slate-600">
+            Showing reliable hotel options instead.
+          </p>
+
+          <ul className="space-y-2">
+            {fallback.map((hotel, index) => (
+              <li
+                key={index}
+                className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-slate-800"
+              >
+                🛏️ {hotel}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* 🔹 AI Hotels */}
+      {hotels.length > 0 && (
+        <ul className="space-y-3">
           {hotels.map((hotel, index) => (
-            <div
+            <li
               key={index}
               className="bg-white/90 backdrop-blur
-                         border border-blue-200/60
+                         border border-indigo-200/60
                          rounded-xl p-4
-                         shadow-md shadow-blue-200/30"
+                         shadow-md shadow-indigo-200/30
+                         text-slate-800"
             >
-              <p className="font-medium text-slate-800">
-                {hotel}
-              </p>
-            </div>
+              🛏️ {renderBoldText(hotel)}
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );

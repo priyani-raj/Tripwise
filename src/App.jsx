@@ -7,7 +7,7 @@ import Itinerary from "./components/Itinerary";
 import Budget from "./components/Budget";
 import { getDistance } from "./utils/getDistance";
 import FoodRecommendations from "./components/FoodRecommendations";
-
+import MustVisitPlaces from "./components/MustVisitPlaces";
 function App() {
   const [tripData, setTripData] = useState(null);
   const [preference, setPreference] = useState("");
@@ -18,6 +18,7 @@ function App() {
     summary: true,
     food: false,
     hotels: false,
+    places:false,
     itinerary: false,
     budget: false,
   });
@@ -135,6 +136,25 @@ function App() {
               />
             </div>
           )}
+          {/* 📍 MUST VISIT PLACES */}
+          <div className="mb-4">
+         <button
+            onClick={() => toggleSection("places")}
+            className="w-full flex justify-between items-center
+            bg-blue-100 text-blue-900
+            px-5 py-4 rounded-xl font-semibold
+            hover:bg-blue-200 transition"
+         >
+          📍 Must Visit Places
+         <span>{openSections.places ? "−" : "+"}</span>
+          </button>
+
+         {openSections.places && (
+         <div className="mt-4 bg-white/90 backdrop-blur rounded-xl p-4 border border-blue-200/60">
+          <MustVisitPlaces city={tripData.destination} />
+            </div>
+          )}
+         </div>
 
           {/* ITINERARY */}
           <button
