@@ -18,20 +18,23 @@ if (!process.env.GEMINI_API_KEY) {
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-app.post("/api/recommendations", async (req, res) => {
+app.post("/api/recommendations", async (req, res) => { console.log("📥 Incoming body:", req.body);
+  console.log("📌 Type received:", req.body.type);
   try {
     const { city, preference, type } = req.body;
 
-    if (!city || !preference || !type) {
+    if (!city || !type) {
       return res.status(400).json({ error: "Missing fields" });
     }
 
     // ✅ VALID TYPES ONLY
-    const allowedTypes = {
-      food: "food options",
-      hotel: "hotels",
-      places: "must visit places",
-    };
+  const allowedTypes = {
+  food: "food options",
+  hotels: "hotels",
+  places: "must visit places",
+};
+
+
 
     if (!allowedTypes[type]) {
       return res.status(400).json({ error: "Invalid type" });
@@ -41,7 +44,7 @@ app.post("/api/recommendations", async (req, res) => {
 You are a travel assistant.
 
 Recommend 5 ${allowedTypes[type]} for a traveler visiting ${city}.
-Preference: ${preference}
+${preference ? `Preference: ${preference}` : ""}
 
 Rules:
 - Be realistic

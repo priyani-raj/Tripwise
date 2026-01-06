@@ -52,11 +52,15 @@ function FoodRecommendations({ preference, city }) {
 
         // ✅ Parse Gemini text → list
         const aiList = data.recommendations
-          ?.split("\n")
-          .map(line =>
-            line.replace(/^[-•*]\s*/, "").trim()
-          )
-          .filter(line => line.length > 0);
+  ?.split("\n")
+  .map(line =>
+    line
+      .replace(/^\d+\.\s*/, "")     // remove numbering like "1."
+      .replace(/^[-•*]+\s*/, "")    // remove bullets and multiple *
+      .replace(/\*\*/g, "")         // remove markdown bold **
+      .trim()
+  )
+  .filter(line => line.length > 0);
 
         setPlaces(aiList || []);
       } catch {
@@ -92,7 +96,15 @@ function FoodRecommendations({ preference, city }) {
                 key={index}
                 className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-slate-800"
               >
-                🍽️ {item}
+                {index % 2 === 0 ? (
+        <span className="font-semibold text-slate-900">
+          🍽️ {food}
+        </span>
+      ) : (
+        <span className="text-slate-700">
+          {item}
+        </span>
+      )}
               </li>
             ))}
           </ul>
@@ -110,7 +122,16 @@ function FoodRecommendations({ preference, city }) {
                          shadow-md shadow-blue-200/30
                          text-slate-800"
             >
-              🍽️ {renderBoldText(item)}
+
+              {index % 2 === 0 ? (
+        <span className="font-semibold text-slate-900">
+          🍽️ {food}
+        </span>
+      ) : (
+        <span className="text-slate-700">
+          {item}
+        </span>
+      )}
             </li>
           ))}
         </ul>

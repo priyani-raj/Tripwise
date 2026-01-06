@@ -71,11 +71,15 @@ function HotelRecommendations({ city, preference }) {
 
         // Convert Gemini text → list
         const aiList = data.recommendations
-          ?.split("\n")
-          .map(line =>
-            line.replace(/^[-•*]\s*/, "").trim()
-          )
-          .filter(Boolean);
+  ?.split("\n")
+  .map(line =>
+    line
+      .replace(/^\d+\.\s*/, "")     // remove numbering like "1."
+      .replace(/^[-•*]+\s*/, "")    // remove bullets and multiple *
+      .replace(/\*\*/g, "")         // remove markdown bold **
+      .trim()
+  )
+  .filter(line => line.length > 0);
 
         setHotels(aiList || []);
       } catch {
@@ -112,7 +116,15 @@ function HotelRecommendations({ city, preference }) {
                 key={index}
                 className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-slate-800"
               >
-                🛏️ {hotel}
+                {index % 2 === 0 ? (
+        <span className="font-semibold text-slate-900">
+           🛏️{hotel}
+        </span>
+      ) : (
+        <span className="text-slate-700">
+          {item}
+        </span>
+      )}
               </li>
             ))}
           </ul>
@@ -131,7 +143,16 @@ function HotelRecommendations({ city, preference }) {
                          shadow-md shadow-indigo-200/30
                          text-slate-800"
             >
-              🛏️ {renderBoldText(hotel)}
+               <h3 className="font-semibold text-slate-900 text-lg">
+        🛏️ {hotel.name}
+      </h3>
+
+      {hotel.description && (
+        <p className="text-slate-700 mt-1">
+          {hotel.description}
+        </p>
+      )}
+              
             </li>
           ))}
         </ul>

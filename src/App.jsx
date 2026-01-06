@@ -151,7 +151,9 @@ function App() {
 
          {openSections.places && (
          <div className="mt-4 bg-white/90 backdrop-blur rounded-xl p-4 border border-blue-200/60">
-          <MustVisitPlaces city={tripData.destination} />
+         <MustVisitPlaces
+           city={tripData.destination}
+           preference={tripData.preference}/>
             </div>
           )}
          </div>

@@ -3,7 +3,7 @@ import fallbackPlaces from "../data/fallbackPlaces";
 import { renderBoldText } from "../utils/renderBoldText";
 const API_URL = import.meta.env.VITE_API_URL;
 
-function MustVisitPlaces({ city }) {
+function MustVisitPlaces({ city,preference }) {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -40,6 +40,7 @@ function MustVisitPlaces({ city }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             city,
+            preference,
             type: "places",
           }),
         });
