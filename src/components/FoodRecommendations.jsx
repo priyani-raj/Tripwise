@@ -98,7 +98,7 @@ function FoodRecommendations({ preference, city }) {
               >
                 {index % 2 === 0 ? (
         <span className="font-semibold text-slate-900">
-          🍽️ {food}
+          🍽️ {item}
         </span>
       ) : (
         <span className="text-slate-700">
@@ -125,7 +125,7 @@ function FoodRecommendations({ preference, city }) {
 
               {index % 2 === 0 ? (
         <span className="font-semibold text-slate-900">
-          🍽️ {food}
+          🍽️ {item}
         </span>
       ) : (
         <span className="text-slate-700">

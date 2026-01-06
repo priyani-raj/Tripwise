@@ -81,7 +81,16 @@ function HotelRecommendations({ city, preference }) {
   )
   .filter(line => line.length > 0);
 
-        setHotels(aiList || []);
+       const hotelPairs = [];
+
+for (let i = 0; i < aiList.length; i += 2) {
+  hotelPairs.push({
+    name: aiList[i],
+    description: aiList[i + 1] || "",
+  });
+}
+
+setHotels(hotelPairs); 
       } catch {
         setHotels([]);
       }
@@ -122,7 +131,7 @@ function HotelRecommendations({ city, preference }) {
         </span>
       ) : (
         <span className="text-slate-700">
-          {item}
+          {hotel}
         </span>
       )}
               </li>
