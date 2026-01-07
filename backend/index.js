@@ -6,7 +6,11 @@ import Groq from "groq-sdk";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
+}));
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -22,7 +26,11 @@ if (!process.env.GROQ_API_KEY) {
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
-
+app.use((req, res, next) => {
+  console.log("🌐 Incoming request:", req.method, req.originalUrl);
+  next();
+});
+app.post("/api/recommendations/", (req, res, next) => next());
 app.post("/api/recommendations", async (req, res) => {
   try {
     const { city, preference, type } = req.body;
