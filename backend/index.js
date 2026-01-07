@@ -79,7 +79,10 @@ Rules:
     console.error("🔥 Groq error:", error.message);
 
     // ⚠️ Do NOT crash frontend
-    res.status(200).json({ recommendations: "" });
+   res.status(200).json({
+  recommendations: "• Popular attractions available locally.\n• Please try again shortly.",
+});
+
   }
 });
 
