@@ -86,3 +86,7 @@ Rules:
 app.listen(5000, () => {
   console.log("✅ Backend running on http://localhost:5000");
 });
+console.log(
+  "🔑 GROQ KEY EXISTS:",
+  Boolean(process.env.GROQ_API_KEY)
+);
