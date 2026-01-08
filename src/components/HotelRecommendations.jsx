@@ -125,15 +125,10 @@ setHotels(hotelPairs);
                 key={index}
                 className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-slate-800"
               >
-                {index % 2 === 0 ? (
-        <span className="font-semibold text-slate-900">
-           🛏️{hotel}
-        </span>
-      ) : (
-        <span className="text-slate-700">
-          {hotel}
-        </span>
-      )}
+               <span className="font-medium text-slate-800">
+  🛏️ {hotel}
+</span>
+
               </li>
             ))}
           </ul>

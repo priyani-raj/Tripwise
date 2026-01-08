@@ -51,18 +51,31 @@ function FoodRecommendations({ preference, city }) {
         const data = await response.json();
 
         // ✅ Parse Gemini text → list
-        const aiList = data.recommendations
+    const lines = data.recommendations
   ?.split("\n")
   .map(line =>
     line
-      .replace(/^\d+\.\s*/, "")     // remove numbering like "1."
-      .replace(/^[-•*]+\s*/, "")    // remove bullets and multiple *
-      .replace(/\*\*/g, "")         // remove markdown bold **
+      .replace(/^\d+\.\s*/, "")
+      .replace(/^[-•*]+\s*/, "")
+      .replace(/\*\*/g, "")
       .trim()
   )
-  .filter(line => line.length > 0);
+  .filter(Boolean);
 
-        setPlaces(aiList || []);
+const groupedFoods = [];
+
+for (let i = 0; i < lines.length; i += 4) {
+  if (lines[i + 1] && lines[i + 2] && lines[i + 3]) {
+    groupedFoods.push({
+      name: lines[i],
+      description: lines[i + 1],
+      price: lines[i + 2 ],
+      map: lines[i + 3],
+    });
+  }
+}
+
+setPlaces(groupedFoods);
       } catch {
         setPlaces([]);
       }
@@ -96,15 +109,9 @@ function FoodRecommendations({ preference, city }) {
                 key={index}
                 className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-slate-800"
               >
-                {index % 2 === 0 ? (
-        <span className="font-semibold text-slate-900">
-          🍽️ {item}
-        </span>
-      ) : (
-        <span className="text-slate-700">
-          {item}
-        </span>
-      )}
+                <span className="font-medium text-slate-800">
+               🍽️ {item}
+              </span>
               </li>
             ))}
           </ul>
@@ -113,27 +120,51 @@ function FoodRecommendations({ preference, city }) {
 
       {places.length > 0 && (
         <ul className="space-y-3">
-          {places.map((item, index) => (
-            <li
-              key={index}
-              className="bg-white/90 backdrop-blur
-                         border border-blue-200/60
-                         rounded-xl p-4
-                         shadow-md shadow-blue-200/30
-                         text-slate-800"
-            >
+      {places.map((food, index) => {
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${food.name} ${city}`
+  )}`;
 
-              {index % 2 === 0 ? (
-        <span className="font-semibold text-slate-900">
-          🍽️ {item}
-        </span>
-      ) : (
-        <span className="text-slate-700">
-          {item}
-        </span>
-      )}
-            </li>
-          ))}
+  return (
+    <li
+      key={index}
+      className="bg-white/90 backdrop-blur
+                 border border-blue-200/60
+                 rounded-xl p-4
+                 shadow-md shadow-blue-200/30
+                 text-slate-800"
+    >
+      <h3 className="font-semibold text-slate-900">
+        🍽️ {food.name}
+      </h3>
+
+      <p className="text-slate-600 mt-1">
+        {food.description}
+      </p>
+
+      <span className="inline-block mt-2 text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full">
+        {food.price}
+      </span>
+
+      <a
+        href={mapsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block mt-3
+                   px-4 py-2
+                   rounded-lg
+                   bg-blue-50 text-blue-700
+                   font-medium text-sm
+                   hover:bg-blue-100
+                   transition"
+      >
+        📍 Open in Google Maps
+      </a>
+    </li>
+  );
+})}
+
+
         </ul>
       )}
     </div>

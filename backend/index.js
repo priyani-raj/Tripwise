@@ -51,18 +51,81 @@ app.post("/api/recommendations", async (req, res) => {
     }
 
     // ✅ Prompt
-    const prompt = `
-You are a travel assistant.
+    let prompt = "";
 
-Recommend 5 ${allowedTypes[type]} for a traveler visiting ${city}.
+/* 🍜 FOOD PROMPT */
+if (type === "food") {
+  prompt = `
+You are a local food guide.
+
+Recommend exactly 5 food places in ${city}.
 ${preference ? `Preference: ${preference}` : ""}
 
-Rules:
-- Be realistic
-- Avoid fake or luxury-only places
-- Use bullet points
-- Short descriptions
+STRICT FORMAT (repeat exactly 5 times):
+
+NAME: <place name>
+DESC: <1 line description>
+PRICE: <₹ price range>
+MAP: <google maps link>
+
+RULES:
+- Use all 4 labels exactly as written
+- Each item must have all 4 fields
+- Do NOT merge price into description
+- Do NOT add extra text
+- Do NOT reorder lines
+- Output ONLY the list
 `;
+}
+
+
+/* 🏨 HOTEL PROMPT */
+else if (type === "hotels") {
+  prompt = `
+You are a hotel recommendation expert.
+
+Recommend exactly 5 good hotels in ${city}.
+${preference ? `Preference: ${preference}` : ""}
+
+STRICT FORMAT (no intro text, no numbering):
+
+Hotel Name
+Area + short description
+Approx price per night in INR (₹)
+clickable Google Maps link
+
+RULES:
+- Avoid ultra-luxury unless preference says luxury
+- Prefer safe, well-reviewed hotels
+- No introductory sentences
+- No emojis
+- Output ONLY the list
+-bold the name of hotel
+`;
+}
+
+/* 📍 MUST VISIT PLACES PROMPT */
+else if (type === "places") {
+  prompt = `
+You are a travel guide.
+
+Recommend exactly 5 must-visit places in ${city}.
+
+STRICT FORMAT (no intro text, no numbering):
+
+Place Name
+Why it is famous (1 line)
+Best time to visit
+clickable Google Maps link 
+
+RULES:
+- Famous and real locations only
+- No emojis
+- No intro or closing text
+- Output ONLY the list
+-Bold the name of the place
+`;
+}
 
     // ✅ Groq LLM call
     const completion = await groq.chat.completions.create({
@@ -97,7 +160,3 @@ Rules:
 app.listen(5000, () => {
   console.log("✅ Backend running on http://localhost:5000");
 });
-console.log(
-  "🔑 GROQ KEY EXISTS:",
-  Boolean(process.env.GROQ_API_KEY)
-);
