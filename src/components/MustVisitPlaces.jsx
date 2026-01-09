@@ -105,11 +105,9 @@ setPlaces(groupedPlaces);
       {places.length > 0 && (
   <ul className="space-y-4">
     {places.map((place, index) => {
-      const mapsUrl =
-        place.map ||
-        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-          `${place.name} ${city}`
-        )}`;
+      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  `${place.name}, ${city}`
+)}`;
 
       return (
         <li
