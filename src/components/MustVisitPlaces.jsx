@@ -48,14 +48,28 @@ function MustVisitPlaces({ city,preference }) {
         const data = await res.json();
 
         if (data?.recommendations) {
-          const list = data.recommendations
-            .split("\n")
-            .map((line) =>
-              line.replace(/^[-•*]\s*/, "").trim()
-            )
-            .filter(Boolean);
+        const lines = data.recommendations
+  ?.split("\n")
+  .map(line =>
+    line
+      .replace(/\*\*/g, "")
+      .replace(/^[-•*]\s*/, "")
+      .trim()
+  )
+  .filter(Boolean);
 
-          setPlaces(list);
+const groupedPlaces = [];
+
+for (let i = 0; i < lines.length; i += 4) {
+  groupedPlaces.push({
+    name: lines[i],
+    description: lines[i + 1] || "",
+    bestTime: lines[i + 2] || "",
+    map: lines[i + 3] || "",
+  });
+}
+
+setPlaces(groupedPlaces);
         } else {
           setPlaces([]);
         }
@@ -89,12 +103,60 @@ function MustVisitPlaces({ city,preference }) {
       )}
 
       {places.length > 0 && (
-        <ul className="list-disc list-inside space-y-1 text-slate-700">
-          {places.map((place, index) => (
-            <li key={index}>{place}</li>
-          ))}
-        </ul>
-      )}
+  <ul className="space-y-4">
+    {places.map((place, index) => {
+      const mapsUrl =
+        place.map ||
+        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+          `${place.name} ${city}`
+        )}`;
+
+      return (
+        <li
+          key={index}
+          className="bg-white/90 backdrop-blur
+                     border border-emerald-200/60
+                     rounded-xl p-5
+                     shadow-md shadow-emerald-200/30"
+        >
+          {/* Place Name */}
+          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+            📍 {place.name}
+          </h3>
+
+          {/* Description */}
+          {place.description && (
+            <p className="text-slate-600 mt-1 leading-relaxed">
+              {place.description}
+            </p>
+          )}
+
+          {/* Best time */}
+          {place.bestTime && (
+            <span className="inline-block mt-2 text-sm bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
+              🕒 {place.bestTime}
+            </span>
+          )}
+
+          {/* Map button */}
+          <a
+            href={mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-3
+                       px-4 py-2 rounded-lg
+                       bg-emerald-50 text-emerald-700
+                       font-medium text-sm
+                       hover:bg-emerald-100 transition"
+          >
+            🧭 Open in Google Maps
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+)}
+
     </div>
   );
 }
