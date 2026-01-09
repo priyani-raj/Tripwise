@@ -29,7 +29,17 @@ function App() {
       [section]: !prev[section],
     }));
   }
+  function goBackFromDashboard() {
+  setTravelMode(null);
+}
 
+function goBackFromTravelMode() {
+  setPreference("");
+}
+
+function goBackFromPreference() {
+  setTripData(null);
+}
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-300 via-indigo-300 to-blue-400 px-6 pt-6">
       {/* TITLE */}
@@ -60,6 +70,15 @@ function App() {
       {/* PREFERENCE */}
       {tripData && !preference && (
         <div className="max-w-xl mx-auto bg-white/90 backdrop-blur rounded-2xl shadow-lg p-6 md:p-8 border border-indigo-300/60">
+          {/* 🔙 Back Button */}
+    <button
+      onClick={goBackFromPreference}
+      className="mb-4 inline-flex items-center gap-2
+                 text-blue-800 font-medium
+                 hover:underline"
+    >
+      ← Back
+    </button>
           <PreferenceSelector onSelect={setPreference} />
         </div>
       )}
@@ -67,10 +86,30 @@ function App() {
       {/* TRAVEL MODE */}
       {tripData && preference && !travelMode && (
         <div className="max-w-xl mx-auto bg-white/90 backdrop-blur rounded-2xl shadow-lg p-6 md:p-8 border border-indigo-300/60">
+          {/* 🔙 Back Button */}
+    <button
+      onClick={goBackFromTravelMode}
+      className="mb-4 inline-flex items-center gap-2
+                 text-blue-800 font-medium
+                 hover:underline"
+    >
+      ← Back
+    </button>
           <TravelOptions onSelect={setTravelMode} />
         </div>
       )}
-
+      {tripData && preference && travelMode && (
+  <div className="max-w-4xl mx-auto mb-4">
+    <button
+      onClick={goBackFromDashboard}
+      className="flex items-center gap-2
+                 text-blue-700 font-medium
+                 hover:underline"
+    >
+      ← Back
+    </button>
+  </div>
+)}
       {/* DASHBOARD WITH DROPDOWNS */}
       {tripData && preference && travelMode && (
         <div className="max-w-4xl mx-auto space-y-4">
