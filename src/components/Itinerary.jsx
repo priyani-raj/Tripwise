@@ -1,25 +1,58 @@
 import { useEffect, useState } from "react";
-import { itineraryActivities } from "../data/itineraryActivities";
-import { generatePlanner } from "../utils/generatePlanner";
+const API_URL = import.meta.env.VITE_API_URL;
 import jsPDF from "jspdf";
 
-function Itinerary({ days, preference }) {
+function Itinerary({ city, days, preference })  {
   const [planner, setPlanner] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
 
   // Generate itinerary
-  function generateItinerary() {
-    const generated = generatePlanner(
-      days,
-      preference,
-      itineraryActivities
-    );
-    setPlanner(generated);
+ async function generateItinerary() {
+  if (!city || !days) {
+    console.warn("Missing city or days", { city, days });
+    return;
+  }
+   try {
+    const res = await fetch(`${API_URL}/api/recommendations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        city,
+        preference,
+        type: "itinerary",
+        days,
+      }),
+    });
+
+    const data = await res.json();
+
+   const parsed = data.recommendations
+      .split("DAY ")
+      .filter(Boolean)
+      .map(dayBlock => {
+        const lines = dayBlock.split("\n").filter(Boolean);
+
+        return lines
+          .filter(line => line.includes("-"))
+          .map(line => {
+            const [time, ...activityParts] = line.split(" - ");
+            return {
+              time: time.trim(),
+              activity: activityParts.join(" - ").trim(),
+            };
+          });
+      });
+
+    setPlanner(parsed);
+  } catch (err) {
+    console.error("Itinerary error", err);
+    setPlanner([]);
+  }
   }
 
   useEffect(() => {
     generateItinerary();
-  }, [days, preference]);
+  }, [city,days, preference]);
 
   // Edit handler
   function handleEdit(dayIndex, slotIndex, newValue) {

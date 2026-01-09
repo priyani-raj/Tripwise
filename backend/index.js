@@ -30,10 +30,9 @@ app.use((req, res, next) => {
   console.log("🌐 Incoming request:", req.method, req.originalUrl);
   next();
 });
-app.post("/api/recommendations/", (req, res, next) => next());
 app.post("/api/recommendations", async (req, res) => {
   try {
-    const { city, preference, type } = req.body;
+    const { city, preference, type ,days} = req.body;
 
     if (!city || !type) {
       return res.status(400).json({ error: "Missing fields" });
@@ -44,14 +43,13 @@ app.post("/api/recommendations", async (req, res) => {
       food: "food options",
       hotels: "hotels",
       places: "must visit places",
+      itinerary: "itinerary"
     };
 
     if (!allowedTypes[type]) {
       return res.status(400).json({ error: "Invalid type" });
     }
-
-    // ✅ Prompt
-    let prompt = "";
+let prompt = "";
 
 /* 🍜 FOOD PROMPT */
 if (type === "food") {
@@ -126,6 +124,46 @@ RULES:
 -Bold the name of the place
 `;
 }
+
+
+else if (type === "itinerary") {
+  if (!days || days < 1) {
+    return res.status(400).json({ error: "Days required for itinerary" });
+  }
+  prompt = `
+You are a professional travel planner.
+
+Create a VERY DETAILED ${days}-day itinerary for ${city}.
+
+Traveler preference: ${preference || "explorer"}
+
+Rules:
+- Plan EXACTLY ${days} days
+- Use REAL place names
+- Include specific locations
+- Logical travel flow (nearby places together)
+- Include food / café suggestions
+- Avoid generic words like "explore"
+- No emojis
+- No explanations
+
+FORMAT EXACTLY LIKE THIS:
+
+DAY 1:
+09:00 AM - Place name - short reason
+12:30 PM - Lunch at restaurant name
+03:00 PM - Place name
+06:00 PM - Evening activity
+
+DAY 2:
+...
+
+END AFTER DAY ${days}.
+`;
+} else {
+  // existing food / hotel / places logic
+}
+
 
     // ✅ Groq LLM call
     const completion = await groq.chat.completions.create({

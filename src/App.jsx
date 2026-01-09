@@ -169,10 +169,11 @@ function App() {
 
           {openSections.itinerary && (
             <div className="bg-white/90 backdrop-blur rounded-2xl shadow-lg p-6 border border-indigo-300/60">
-              <Itinerary
-                days={Number(tripData.days)}
-                preference={preference}
-              />
+            <Itinerary
+  city={tripData.destination}
+  days={Number(tripData.days)}
+  preference={preference}
+/>
             </div>
           )}
 
