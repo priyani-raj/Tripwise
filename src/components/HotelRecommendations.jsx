@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import fallbackHotels from "../data/fallbackHotels";
-import { renderBoldText } from "../utils/renderBoldText";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 function HotelRecommendations({ city, preference }) {
@@ -42,7 +42,7 @@ function HotelRecommendations({ city, preference }) {
     cityKeyMap[cleanCity] ||
     cleanCity.charAt(0).toUpperCase() + cleanCity.slice(1);
 
-  // 🔹 Fallback hotels (safety net)
+  // 🔹 Fallback hotels
   const fallback =
     fallbackHotels[pref]?.[normalizedCity] ||
     fallbackHotels[pref]?.Generic ||
@@ -53,9 +53,8 @@ function HotelRecommendations({ city, preference }) {
     async function fetchHotels() {
       setLoading(true);
       try {
-       const response = await fetch(
-  `${API_URL}/api/recommendations`,
-
+        const response = await fetch(
+          `${API_URL}/api/recommendations`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -69,28 +68,57 @@ function HotelRecommendations({ city, preference }) {
 
         const data = await response.json();
 
-        // Convert Gemini text → list
-        const aiList = data.recommendations
+    const lines = data.recommendations
   ?.split("\n")
-  .map(line =>
-    line
-      .replace(/^\d+\.\s*/, "")     // remove numbering like "1."
-      .replace(/^[-•*]+\s*/, "")    // remove bullets and multiple *
-      .replace(/\*\*/g, "")         // remove markdown bold **
-      .trim()
-  )
-  .filter(line => line.length > 0);
+  .map(l => l.trim())
+  .filter(Boolean);
 
-       const hotelPairs = [];
+const groupedHotels = [];
+let current = {};
 
-for (let i = 0; i < aiList.length; i += 2) {
-  hotelPairs.push({
-    name: aiList[i],
-    description: aiList[i + 1] || "",
-  });
+lines.forEach(line => {
+  if (line.startsWith("NAME:")) {
+    // push previous hotel
+    if (current.name) groupedHotels.push(current);
+    current = { name: line.replace("NAME:", "").trim() };
+    return;
+  }
+
+  if (line.startsWith("AREA:")) {
+    current.area = line.replace("AREA:", "").trim();
+    return;
+  }
+
+  if (line.startsWith("PRICE:") || line.toLowerCase().includes("price")) {
+    current.price = line.replace(/^PRICE:\s*/i, "").trim();
+    return;
+  }
+
+  if (line.startsWith("MAP:")) {
+    current.map = line.replace("MAP:", "").trim();
+    return;
+  }
+});
+
+// push last hotel
+if (current.name) groupedHotels.push(current);
+
+setHotels(groupedHotels);
+
+
+
+// 🔹 FALLBACK: if labels not found, use simple pairing
+if (groupedHotels.length === 0) {
+  for (let i = 0; i < lines.length; i += 2) {
+    groupedHotels.push({
+      name: lines[i],
+      area: lines[i + 1] || "",
+    });
+  }
 }
 
-setHotels(hotelPairs); 
+setHotels(groupedHotels);
+
       } catch {
         setHotels([]);
       }
@@ -125,10 +153,9 @@ setHotels(hotelPairs);
                 key={index}
                 className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-slate-800"
               >
-               <span className="font-medium text-slate-800">
-  🛏️ {hotel}
-</span>
-
+                <span className="font-medium text-slate-800">
+                  🛏️ {hotel}
+                </span>
               </li>
             ))}
           </ul>
@@ -138,27 +165,54 @@ setHotels(hotelPairs);
       {/* 🔹 AI Hotels */}
       {hotels.length > 0 && (
         <ul className="space-y-3">
-          {hotels.map((hotel, index) => (
-            <li
-              key={index}
-              className="bg-white/90 backdrop-blur
-                         border border-indigo-200/60
-                         rounded-xl p-4
-                         shadow-md shadow-indigo-200/30
-                         text-slate-800"
-            >
-               <h3 className="font-semibold text-slate-900 text-lg">
-        🛏️ {hotel.name}
-      </h3>
+          {hotels.map((hotel, index) => {
+            // ✅ Always generate correct Maps link
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+              `${hotel.name} ${city}`
+            )}`;
 
-      {hotel.description && (
-        <p className="text-slate-700 mt-1">
-          {hotel.description}
-        </p>
-      )}
-              
-            </li>
-          ))}
+            return (
+              <li
+                key={index}
+                className="bg-white/90 backdrop-blur
+                           border border-indigo-200/60
+                           rounded-xl p-5
+                           shadow-md shadow-indigo-200/30
+                           text-slate-800"
+              >
+                <h3 className="font-semibold text-slate-900 text-lg">
+                  🏨 {hotel.name}
+                </h3>
+
+                {hotel.area && (
+                  <p className="text-slate-600 mt-1">
+                    {hotel.area}
+                  </p>
+                )}
+
+                {hotel.price && (
+                  <span className="inline-block mt-2 text-sm bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
+                    {hotel.price}
+                  </span>
+                )}
+
+                <a
+                  href={mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-3
+                             px-4 py-2
+                             rounded-lg
+                             bg-indigo-50 text-indigo-700
+                             font-medium text-sm
+                             hover:bg-indigo-100
+                             transition"
+                >
+                  📍 Open in Google Maps
+                </a>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

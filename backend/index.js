@@ -84,25 +84,25 @@ else if (type === "hotels") {
   prompt = `
 You are a hotel recommendation expert.
 
-Recommend exactly 5 good hotels in ${city}.
+Recommend exactly 5 hotels in ${city}.
 ${preference ? `Preference: ${preference}` : ""}
 
-STRICT FORMAT (no intro text, no numbering):
+STRICT FORMAT (repeat exactly 5 times):
 
-Hotel Name
-Area + short description
-Approx price per night in INR (₹)
-clickable Google Maps link
+NAME: <hotel name>
+AREA: <area + 1 line description>
+PRICE: <approx price per night in INR>
+MAP: <google maps link>
 
 RULES:
-- Avoid ultra-luxury unless preference says luxury
-- Prefer safe, well-reviewed hotels
-- No introductory sentences
-- No emojis
+- Use all 4 labels exactly
+- Do NOT merge price into description
+- Do NOT add extra text
+- Do NOT reorder lines
 - Output ONLY the list
--bold the name of hotel
 `;
 }
+
 
 /* 📍 MUST VISIT PLACES PROMPT */
 else if (type === "places") {
