@@ -76,7 +76,7 @@ Backend (Node + Express)
 - PORT=5000
 - GROQ_API_KEY=your_groq_api_key
 
-## Cloning the Repository
+## ⚙️Installation and Setup
 - git clone https://github.com/priyani-raj/tripwise.git
 - cd tripwise
 
