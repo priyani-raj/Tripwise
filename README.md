@@ -1,16 +1,166 @@
-# React + Vite
+🌍 TripWise – AI-Powered Travel Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+TripWise is a smart, full-stack travel planning web application that helps users plan trips effortlessly by generating personalized travel recommendations based on source, destination, preferences, and trip duration.
 
-Currently, two official plugins are available:
+The project combines AI-generated recommendations with real-world distance calculation to provide a practical and user-friendly travel planning experience.
+🚀 Features
+🧭 Trip Planning
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Enter source, destination, and number of days
 
-## React Compiler
+Choose travel preferences
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Select travel mode
 
-## Expanding the ESLint configuration
+View trip summary in a clean dashboard
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+📏 Distance & Travel Time Calculation
+
+Calculates distance and estimated travel time
+
+Uses OpenRouteService (ORS) Directions API
+
+If distance calculation succeeds, locations are treated as valid
+
+🤖 AI-Powered Recommendations (via GROQ)
+
+🍜 Food recommendations
+
+🏨 Hotel recommendations
+
+📍 Must-visit places
+
+🗓️ Day-wise itinerary
+
+💰 Budget estimation
+
+🛡️ Error Handling
+
+Graceful handling of API failures
+
+User-friendly error messages
+
+Fallback content when AI responses are unavailable
+
+🎨 Modern UI/UX
+
+Clean and responsive design
+
+Expandable dashboard sections
+
+Smooth navigation with back buttons
+
+🛠️ Tech Stack
+Frontend
+
+React (Vite)
+
+Tailwind CSS
+
+OpenRouteService (distance calculation)
+
+Backend
+
+Node.js
+
+Express.js
+
+GROQ API (AI recommendations)
+
+APIs & Services
+
+GROQ – AI-generated travel content
+
+OpenRouteService (ORS) – distance & travel time calculation
+
+🧱 Project Architecture
+Frontend (React + Vite)
+ ├─ User inputs (source, destination, days)
+ ├─ Distance calculation (ORS Directions API)
+ ├─ Displays travel summary
+ └─ Fetches AI recommendations
+
+Backend (Node + Express)
+ └─ Generates AI recommendations using GROQ
+
+🔐 Environment Variables
+Frontend .env
+VITE_API_URL=http://localhost:5000
+VITE_ORS=your_openrouteservice_api_key
+
+Backend .env
+PORT=5000
+GROQ_API_KEY=your_groq_api_key
+
+
+⚠️ Do not commit .env files to GitHub.
+
+⚙️ Installation & Setup
+1️⃣ Clone the Repository
+git clone https://github.com/your-username/tripwise.git
+cd tripwise
+
+2️⃣ Setup Backend
+cd backend
+npm install
+npm run dev
+
+3️⃣ Setup Frontend
+cd frontend
+npm install
+npm run dev
+
+
+Frontend runs at:
+
+http://localhost:5173
+
+
+Backend runs at:
+
+http://localhost:5000
+
+🧪 How Location Handling Works
+
+TripWise does not perform separate location validation.
+
+Instead:
+
+Locations are considered valid if OpenRouteService successfully calculates distance
+
+This avoids redundant validation calls
+
+Keeps the system efficient and simple
+
+If ORS fails to calculate distance, an error message is shown to the user.
+
+📌 Why This Project Stands Out
+
+Clean frontend–backend separation
+
+Real-world API usage
+
+Secure handling of API keys
+
+Robust error handling
+
+Modular and scalable component structure
+
+Internship-ready full-stack project
+🔮 Future Improvements
+
+Location autocomplete
+
+Map visualization
+
+Saved trips & user accounts
+
+Multi-city travel planning
+
+Caching AI responses
+
+👩‍💻 Author
+
+Priyani Rajvanshi
+B.Tech CSE Student
+Web Development | AI Integration | Problem Solving
